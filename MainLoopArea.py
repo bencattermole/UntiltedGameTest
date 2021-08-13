@@ -4,6 +4,7 @@ import pygame
 import math
 import sys
 import WorldGen
+import npcAi
 
 """
 Hello!
@@ -17,7 +18,11 @@ The current (12/08/2021) controls are as follows:
     t - this takes in an input from the console, this doesnt have any use at the moment
     i - prints the current window position of the red figure
     
-the blue figure that starts under you does not yet move
+The blue figure currently uses the movement from the npcAi.py file, go there to see the logic
+    (preferred tile type is set here to water, you can change it for different behaviour)
+
+The last bug I fixed was a crash when the blue figure went to the corner, I think my fix is working but please contact
+me if you experience a crash when the blue figure moves to the corner :)
 
 Thanks for playing!
 """
@@ -57,20 +62,20 @@ spriteLookup = {'water': water_IMG, 'plant': plant_IMG, 'grass': grass_IMG, 'wat
 
 class Player(object):
     def __init__(self):
-        self.rect = pygame.rect.Rect((64, 54, 16, 16))
+        self.rect = pygame.rect.Rect((64, 64, 16, 16))
         self.color = (255, 255, 255)
 
     def handle_keys(self):
         key = pygame.key.get_pressed()
         dist = 1
         if key[pygame.K_LEFT] and (self.rect.left > 0):
-           self.rect.move_ip(-5, 0)
+           self.rect.move_ip(-16, 0)
         if key[pygame.K_RIGHT] and (self.rect.right < Screen_Size):
-           self.rect.move_ip(5, 0)
+           self.rect.move_ip(16, 0)
         if key[pygame.K_UP] and (self.rect.top > 0):
-           self.rect.move_ip(0, -5)
+           self.rect.move_ip(0, -16)
         if key[pygame.K_DOWN] and (self.rect.bottom < Screen_Size):
-           self.rect.move_ip(0, 5)
+           self.rect.move_ip(0, 16)
 
     def draw(self, surface):
         pygame.draw.rect(screen, self.color, self.rect)
@@ -87,8 +92,6 @@ def draw_terrain_grid():
     for x in range(0, Screen_Size, block_size):
         for y in range(0, Screen_Size, block_size):
             rect = pygame.Rect(x, y, block_size, block_size)
-            #pygame.draw.rect(screen, map[WorldGen.coord(int(x/16), int(y/16))].color, rect) #one here only draws outline
-            #map[WorldGen.coord(int(x / 16), int(y / 16))].img
             screen.blit(spriteLookup[map[WorldGen.coord(int(x / 16), int(y / 16))].name], rect)
 
 
@@ -100,9 +103,10 @@ pygame.init()
 
 
 player = Player()
+wraith = npcAi.NPC('wraith', Screen_Size, 'water')
 clock = pygame.time.Clock()
 
-wraith_Rect = pygame.rect.Rect((64, 54, 16, 16))
+wraith_Rect = pygame.rect.Rect((304, 304, 16, 16))
 
 running = True
 while running:
@@ -121,12 +125,11 @@ while running:
     screen.fill((0, 0, 0))
     draw_terrain_grid()
 
-
-
     #player.draw(screen)
     player.handle_keys()
-    screen.blit(wraith_IMG, wraith_Rect)
+    wraith.decision( WorldGen.coord(int(wraith.rect.x/16), int(wraith.rect.y/16)), map)
+    screen.blit(wraith_IMG, wraith.rect)
     screen.blit(player_IMG, player.rect)
     pygame.display.update()
 
-    clock.tick(40)
+    clock.tick(30)
