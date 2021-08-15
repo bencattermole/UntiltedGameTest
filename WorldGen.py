@@ -3,6 +3,14 @@ import random
 import numpy as np
 
 
+class neighbors:
+    def __init__(self):
+        self.water_tot_num = 0
+        self.plant_tot_num = 0
+        self.grass_tot_num = 0
+        self.water = 0
+
+
 class terrianType:
     def __init__(self, name, color):
         self.name = name
@@ -76,18 +84,22 @@ def generate_new_map(dimension):
 def iterate_new_map(dimension, generations, rand_dict, Con):
 
     dict_to_use_parent = rand_dict
+    '''
+    Could change the generation loop so that it doesnt always start with water and grass, could instead be two random
+    tile types
+    '''
 
     for generation in range(generations):
         dict_to_use = {}
         for x in range(dimension):
             for y in range(dimension):
+                surroundings = get_neighbors_water(x, y, dict_to_use_parent)
 
                 if dict_to_use_parent[coord(x, y)] == terrain_types[0]:
 
                     #IF CURRENT TILE IS WATER THEN:
 
-                    WATERcount_1away = get_neighbors_water(x, y, dict_to_use_parent)
-                    if WATERcount_1away <= Con[2]:
+                    if surroundings.water_tot_num <= Con[2]:
                         dict_to_use.update({coord(x, y): terrain_types[2]})
                     else:
                         dict_to_use.update({coord(x, y): terrain_types[0]})
@@ -96,9 +108,7 @@ def iterate_new_map(dimension, generations, rand_dict, Con):
 
                         #ELSE IF CURRENT TILE IS GRASS THEN:
 
-                        WATERcount_1away = get_neighbors_water(x, y, dict_to_use_parent)
-
-                        if WATERcount_1away >= Con[3]:
+                        if surroundings.water_tot_num >= Con[3]:
                             dict_to_use.update({coord(x, y): terrain_types[0]})
                         else:
                             dict_to_use.update({coord(x, y): terrain_types[2]})
@@ -109,6 +119,7 @@ def iterate_new_map(dimension, generations, rand_dict, Con):
 
     for x in range(dimension):
         for y in range(dimension):
+            surroundings = get_neighbors_water(x, y, dict_to_use_parent)
 
             choice = random.uniform(0, 1)
 
@@ -116,15 +127,13 @@ def iterate_new_map(dimension, generations, rand_dict, Con):
                 dict_to_use.update({coord(x, y): get_random_plant(False)})
 
             if dict_to_use_parent[coord(x, y)] == terrain_types[0] and choice <= 0.2:
-                WATERcount_1away = get_neighbors_water(x, y, dict_to_use_parent)
-                if WATERcount_1away <= 5:
+                if surroundings.water_tot_num <= 5:
                     dict_to_use.update({coord(x, y): get_random_plant(True)})
                 else:
                     dict_to_use.update({coord(x, y): terrain_types[0]})
 
             if dict_to_use_parent[coord(x, y)] == terrain_types[2] and choice <= 0.2:
-                WATERcount_1away = get_neighbors_water(x, y, dict_to_use_parent)
-                if WATERcount_1away >= 1:
+                if surroundings.water_tot_num >= 1:
                     dict_to_use.update({coord(x, y): get_random_plant(False)})
                 else:
                     dict_to_use.update({coord(x, y): terrain_types[2]})
@@ -133,13 +142,30 @@ def iterate_new_map(dimension, generations, rand_dict, Con):
                 dict_to_use.update({coord(x, y): get_random_grass_type()})
 
             if dict_to_use_parent[coord(x, y)] == terrain_types[0]:
-                WATERcount_1away = get_neighbors_water(x, y, dict_to_use_parent)
-                if WATERcount_1away == 8:
+                if surroundings.water_tot_num == 8:
                     dict_to_use.update({coord(x, y): terrain_types[7]})
                 else:
                     dict_to_use.update({coord(x, y): terrain_types[0]})
 
-    print(Con)
+    #island correction loop and lone plant deletion loop, should probably change this, seems very inefficent
+    #has to be in seperate loop because if in first it will not work
+
+    dict_to_use_parent = dict_to_use
+
+    for x in range(dimension):
+        for y in range(dimension):
+            surroundings = get_neighbors_water(x, y, dict_to_use_parent)
+            if dict_to_use_parent[coord(x, y)] == terrain_types[7]:
+                if surroundings.plant_tot_num >= 1:
+                    dict_to_use.update({coord(x, y): terrain_types[0]})
+                else:
+                    dict_to_use.update({coord(x, y): terrain_types[7]})
+            if dict_to_use_parent[coord(x, y)] == terrain_types[1]:
+                if surroundings.grass_tot_num == 8:
+                    dict_to_use.update({coord(x, y): terrain_types[2]})
+                else:
+                    dict_to_use.update({coord(x, y): terrain_types[1]})
+
     return dict_to_use
 
 
@@ -170,7 +196,6 @@ def get_random_grass_type():
         return terrain_types[6]
 
 
-
 def get_neighbors_water(x, y, test_dict):
     #offsets
 
@@ -179,15 +204,29 @@ def get_neighbors_water(x, y, test_dict):
     #      5 4 3
 
     offset = [coord(x, y-1), coord(x+1, y-1), coord(x+1, y), coord(x+1, y+1), coord(x, y+1), coord(x-1, y+1), coord(x-1, y), coord(x-1, y-1)]
-    num_of_water = 0
+    tiles = neighbors()
 
     for neighbor in offset:
         if neighbor in test_dict:
-            if test_dict[neighbor] == terrain_types[0] or test_dict[neighbor] == terrain_types[7]:
-                num_of_water += 1
-            else:
-                pass
+            if test_dict[neighbor] == terrain_types[0]:
+                tiles.water += 1
+                tiles.water_tot_num += 1
+            elif test_dict[neighbor] == terrain_types[1]:
+                tiles.plant_tot_num += 1
+            elif test_dict[neighbor] == terrain_types[2]:
+                tiles.grass_tot_num += 1
+            elif test_dict[neighbor] == terrain_types[3]:
+                tiles.plant_tot_num += 1
+            elif test_dict[neighbor] == terrain_types[4]:
+                tiles.grass_tot_num += 1
+            elif test_dict[neighbor] == terrain_types[5]:
+                tiles.grass_tot_num += 1
+            elif test_dict[neighbor] == terrain_types[6]:
+                tiles.grass_tot_num += 1
+            elif test_dict[neighbor] == terrain_types[7]:
+                tiles.water += 1
+                tiles.water_tot_num += 1
         else:
             pass
 
-    return num_of_water
+    return tiles

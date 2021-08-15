@@ -104,7 +104,9 @@ pygame.init()
 
 player = Player()
 wraith = npcAi.NPC('wraith', Screen_Size, 'water')
+
 clock = pygame.time.Clock()
+
 
 wraith_Rect = pygame.rect.Rect((304, 304, 16, 16))
 
