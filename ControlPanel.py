@@ -8,12 +8,13 @@ import npcAi
 
 COLOR_INACTIVE = pygame.Color('gray30')
 COLOR_ACTIVE = pygame.Color('white')
+path = str(os.path.dirname(__file__))
 
 def draw_controls(screen, Screen_Size):
     #font selection
 
-    font_norm = pygame.font.Font(r'C:\Users\Ben\PycharmProjects\UntiltedGameTest\kongtext.ttf', 15)
-    font = pygame.font.Font(r'C:\Users\Ben\PycharmProjects\UntiltedGameTest\kongtext.ttf', 8)
+    font_norm = pygame.font.Font(f'{path}/kongtext.ttf', 15)
+    font = pygame.font.Font(f'{path}/kongtext.ttf', 8)
 
     '''
     [ codeman38 | cody@zone38.net | http://www.zone38.net/ ]
@@ -44,7 +45,7 @@ class InputBox:
         self.rect = pygame.Rect(x, y, w, h)
         self.color = COLOR_INACTIVE
         self.text = text
-        self.font = pygame.font.Font(r'C:\Users\Ben\PycharmProjects\UntiltedGameTest\kongtext.ttf', 20)
+        self.font = pygame.font.Font(f'{path}/kongtext.ttf', 20)
         self.txt_surface = self.font.render(text, True, self.color)
         self.active = False
 

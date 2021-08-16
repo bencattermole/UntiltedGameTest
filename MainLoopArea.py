@@ -16,7 +16,6 @@ The current (12/08/2021) controls are as follows:
     arrow keys - move red figure
     g - generates a new map and prints values used into console, to manually change go to world gen and find Con array
         (fine tuning is required to get a 'good' map)
-    t - this takes in an input from the console, this doesnt have any use at the moment
     i - prints the current window position of the red figure
     
 The blue figure currently uses the movement from the npcAi.py file, go there to see the logic
@@ -27,6 +26,8 @@ running, if you enter text here (other that the '.' for the number between 0 and
 random values for each will be taken.
     (In the future this might change, as well as the addition of parameters for the npcAi)
 
+I have change the path variable so it now should work without having to change it
+
 Thanks for playing!
 """
 
@@ -34,6 +35,8 @@ Screen_Size = 1024
 block_size = 16
 WHITE = (200, 200, 200)
 BLACK = (0, 0, 0)
+path = str(os.path.dirname(__file__))
+
 
 map = WorldGen.generate_new_map(int((Screen_Size/block_size)))
 
@@ -44,21 +47,21 @@ clock = pygame.time.Clock()
 
 #you may have to change the following path variables to where the sprites are
 
-player_IMG = pygame.image.load('C:/Users/Ben/PycharmProjects/UntiltedGameTest/Sprites/Player_Character.png').convert()
+player_IMG = pygame.image.load(f'{path}/Sprites/Player_Character.png').convert()
 player_IMG.set_colorkey((0, 0, 0, 0))
 # Use the upper-left pixel color as transparent
 
-wraith_IMG = pygame.image.load('C:/Users/Ben/PycharmProjects/UntiltedGameTest/Sprites/Wraith.png').convert()
+wraith_IMG = pygame.image.load(f'{path}/Sprites/Wraith.png').convert()
 wraith_IMG.set_colorkey((0, 0, 0, 0))
 
-water_IMG = pygame.image.load('C:/Users/Ben/PycharmProjects/UntiltedGameTest/Sprites/Water.png').convert()
-plant_IMG = pygame.image.load('C:/Users/Ben/PycharmProjects/UntiltedGameTest/Sprites/Plant.png').convert()
-grass_IMG = pygame.image.load('C:/Users/Ben/PycharmProjects/UntiltedGameTest/Sprites/Grass.png').convert()
-water_plant_IMG = pygame.image.load('C:/Users/Ben/PycharmProjects/UntiltedGameTest/Sprites/Water_plant.png').convert()
-grass_1_IMG = pygame.image.load('C:/Users/Ben/PycharmProjects/UntiltedGameTest/Sprites/Grass_1.png').convert()
-grass_2_IMG = pygame.image.load('C:/Users/Ben/PycharmProjects/UntiltedGameTest/Sprites/Grass_2.png').convert()
-grass_3_IMG = pygame.image.load('C:/Users/Ben/PycharmProjects/UntiltedGameTest/Sprites/Grass_3.png').convert()
-water_deep_IMG = pygame.image.load('C:/Users/Ben/PycharmProjects/UntiltedGameTest/Sprites/Water_Deep.png').convert()
+water_IMG = pygame.image.load(f'{path}/Sprites/Water.png').convert()
+plant_IMG = pygame.image.load(f'{path}/Sprites/Plant.png').convert()
+grass_IMG = pygame.image.load(f'{path}/Sprites/Grass.png').convert()
+water_plant_IMG = pygame.image.load(f'{path}/Sprites/Water_plant.png').convert()
+grass_1_IMG = pygame.image.load(f'{path}/Sprites/Grass_1.png').convert()
+grass_2_IMG = pygame.image.load(f'{path}/Sprites/Grass_2.png').convert()
+grass_3_IMG = pygame.image.load(f'{path}/Sprites/Grass_3.png').convert()
+water_deep_IMG = pygame.image.load(f'{path}/Sprites/Water_Deep.png').convert()
 
 spriteLookup = {'water': water_IMG, 'plant': plant_IMG, 'grass': grass_IMG, 'water_plant': water_plant_IMG, 'grass_1': grass_1_IMG, 'grass_2': grass_2_IMG, 'grass_3': grass_3_IMG, 'deep': water_deep_IMG}
 
