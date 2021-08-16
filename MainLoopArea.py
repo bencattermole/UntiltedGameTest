@@ -5,6 +5,7 @@ import math
 import sys
 import WorldGen
 import npcAi
+import ControlPanel
 
 """
 Hello!
@@ -21,8 +22,10 @@ The current (12/08/2021) controls are as follows:
 The blue figure currently uses the movement from the npcAi.py file, go there to see the logic
     (preferred tile type is set here to water, you can change it for different behaviour)
 
-The last bug I fixed was a crash when the blue figure went to the corner, I think my fix is working but please contact
-me if you experience a crash when the blue figure moves to the corner :)
+I have now added a menu on the right hand side that allows you to change the world generation settings while the game is
+running, if you enter text here (other that the '.' for the number between 0 and 1) a try, except loop will fail and
+random values for each will be taken.
+    (In the future this might change, as well as the addition of parameters for the npcAi)
 
 Thanks for playing!
 """
@@ -34,7 +37,7 @@ BLACK = (0, 0, 0)
 
 map = WorldGen.generate_new_map(int((Screen_Size/block_size)))
 
-screen = pygame.display.set_mode((Screen_Size, Screen_Size))
+screen = pygame.display.set_mode((int(Screen_Size + (Screen_Size/4)), Screen_Size))
 pygame.display.set_caption("Game")
 
 clock = pygame.time.Clock()
@@ -107,6 +110,23 @@ wraith = npcAi.NPC('wraith', Screen_Size, 'water')
 
 clock = pygame.time.Clock()
 
+'''
+########################################################################################################################
+        DO NOT TOUCH ANY OF THESE INPUT BOXES AS THEY ARE USED IN THE MENU, IF YOU DO YOU MAY HAVE TO REINSTALL
+########################################################################################################################
+'''
+
+input_box1 = ControlPanel.InputBox(Screen_Size + 5, 100, 140, 32)
+input_box2 = ControlPanel.InputBox(Screen_Size + 5, 200, 140, 32)
+input_box3 = ControlPanel.InputBox(Screen_Size + 5, 300, 140, 32)
+input_box4 = ControlPanel.InputBox(Screen_Size + 5, 400, 140, 32)
+input_boxes = [input_box1, input_box2, input_box3, input_box4]
+
+'''
+########################################################################################################################
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+########################################################################################################################
+'''
 
 wraith_Rect = pygame.rect.Rect((304, 304, 16, 16))
 
@@ -118,11 +138,13 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_t:
-                just_a_quick_test()
+                pass
             if event.key == pygame.K_g:
-                map = WorldGen.generate_new_map(int((Screen_Size/block_size)))
+                map = WorldGen.generate_new_map_with_inputs(int((Screen_Size/block_size)), input_box1.text, input_box2.text, input_box3.text, input_box4.text)
             if event.key == pygame.K_i:
                 get_ground_info(player.rect)
+        for box in input_boxes:
+            box.handle_event(event)
 
     screen.fill((0, 0, 0))
     draw_terrain_grid()
@@ -132,6 +154,14 @@ while running:
     wraith.decision( WorldGen.coord(int(wraith.rect.x/16), int(wraith.rect.y/16)), map)
     screen.blit(wraith_IMG, wraith.rect)
     screen.blit(player_IMG, player.rect)
+
+    for box in input_boxes:
+        box.update()
+
+    for box in input_boxes:
+        box.draw(screen)
+
+    ControlPanel.draw_controls(screen, Screen_Size)
     pygame.display.update()
 
     clock.tick(30)

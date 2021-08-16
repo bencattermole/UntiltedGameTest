@@ -58,7 +58,7 @@ def generate_new_map(dimension):
 
     #Con[0] = chance of water to spawn
     #Con[1] = Num of generations 1 - 5
-    #Con[2] = Num of neighbors for water to GROW
+    #Con[2] = Num of neighbors for water to remains
     #Con[3] = Num of neighbors for ground to become water
 
     Con = [random.uniform(0, 1), random.randint(1,5), random.randint(0,9), random.randint(0,9)]
@@ -80,6 +80,37 @@ def generate_new_map(dimension):
     #choice >> 1 - fewer spawn
     #generaitons = more applications of rules
 
+
+def generate_new_map_with_inputs(dimension, first, second, third, fourth):
+
+    shape = (dimension, dimension)
+
+    try:
+        Con = [float(first), int(second), int(third), int(fourth)]
+    except:
+        #Con[0] = chance of water to spawn
+        #Con[1] = Num of generations 1 - 5
+        #Con[2] = Num of neighbors for water to remains
+        #Con[3] = Num of neighbors for ground to become water
+
+        Con = [random.uniform(0, 1), random.randint(1,5), random.randint(0,9), random.randint(0,9)]
+
+    WATER = 0
+    PLANT = 1
+    GRASS = 2
+    # create a random map
+    new_map = np.ones(shape)
+    rand_dict = {}
+
+    for i in range(dimension):
+        for j in range(dimension):
+            choice = random.uniform(0, 1)
+            rand_dict[coord(i, j)] = terrain_types[2] if choice < Con[0] else terrain_types[0]
+
+    return iterate_new_map(dimension, Con[1], rand_dict, Con)
+
+    #choice >> 1 - fewer spawn
+    #generaitons = more applications of rules
 
 def iterate_new_map(dimension, generations, rand_dict, Con):
 
